@@ -79,4 +79,4 @@ Feel free to submit issues and enhancement requests!
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available under the [MIT License](https://github.com/SeppPenner/simple-city-guesser/blob/master/License.txt).
