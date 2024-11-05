@@ -14,7 +14,7 @@ A fun and interactive web application built with React that helps users learn wo
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
-- Node.js (version 11.12.0 or higher)
+- Node.js (version 18.0.0 or higher)
 - npm (comes with Node.js)
 
 ## Installation
