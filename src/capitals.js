@@ -36,7 +36,7 @@ export const capitals = [
     { city: "Cairo", country: "Egypt", coordinates: [31.2357, 30.0444] },
     { city: "Nairobi", country: "Kenya", coordinates: [36.8219, -1.2921] },
     { city: "Cape Town", country: "South Africa", coordinates: [18.4241, -33.9249] },
-    { city: "Lagos", country: "Nigeria", coordinates: [3.3792, 6.5244] },
+    { city: "Abuja", country: "Nigeria", coordinates: [7.4917, 9.0579] },
     { city: "Addis Ababa", country: "Ethiopia", coordinates: [38.7578, 9.0320] },
     { city: "Bangkok", country: "Thailand", coordinates: [100.5018, 13.7563] }
 ];

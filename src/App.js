@@ -1,14 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   ComposableMap,
   Geographies,
   Geography,
-  Marker,
-  ZoomableGroup
+  Marker
 } from "react-simple-maps";
 import { capitals } from './capitals';
-
-const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-continents.json";
 
 const App = () => {
   const [remainingCapitals, setRemainingCapitals] = useState([...capitals]);
@@ -16,39 +13,83 @@ const App = () => {
   const [userInput, setUserInput] = useState('');
   const [guessedCapitals, setGuessedCapitals] = useState([]);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const inputRef = useRef(null);
 
   // Initialize the game
   const selectNewCapital = useCallback(() => {
     if (remainingCapitals.length > 0) {
       const randomIndex = Math.floor(Math.random() * remainingCapitals.length);
-      setCurrentCapital(remainingCapitals[randomIndex]);
-      setUserInput('');
+      const selected = remainingCapitals[randomIndex];
+      console.log('Selected new capital:', selected.city);
+      setCurrentCapital(selected);
       setError(null);
+      setSuccess(false);
+      // Don't clear input here anymore
     }
   }, [remainingCapitals]);
 
   // Start the game when component mounts
-  React.useEffect(() => {
+  useEffect(() => {
     if (!currentCapital) {
       selectNewCapital();
     }
   }, [currentCapital, selectNewCapital]);
 
-  const handleGuess = () => {
-    if (!currentCapital) return;
-
-    if (userInput.toLowerCase() === currentCapital.city.toLowerCase()) {
-      // Correct guess
-      setGuessedCapitals([...guessedCapitals, currentCapital]);
-      setRemainingCapitals(remainingCapitals.filter(cap => cap.city !== currentCapital.city));
-      setError(null);
-      selectNewCapital();
-    } else {
-      // Wrong guess
-      setError(`Incorrect! Try another capital.`);
-      selectNewCapital();
+  // Focus input field when capital changes
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
-    setUserInput('');
+  }, [currentCapital]);
+
+  const handleInputChange = (e) => {
+    setUserInput(e.target.value);
+    setError(null);
+    setSuccess(false);
+  };
+
+  const handleGuess = () => {
+    if (!currentCapital || !userInput.trim()) {
+      setError("Please enter a city name");
+      return;
+    }
+
+    console.log('Submitting guess:', userInput);
+    console.log('Current capital:', currentCapital.city);
+    
+    const normalizedInput = userInput.toLowerCase().trim();
+    const normalizedAnswer = currentCapital.city.toLowerCase().trim();
+
+    if (normalizedInput === normalizedAnswer) {
+      console.log('Correct guess!');
+      setSuccess(true);
+      setError(null);
+      
+      // Update guessed capitals
+      const newGuessedCapitals = [...guessedCapitals, currentCapital];
+      setGuessedCapitals(newGuessedCapitals);
+      
+      // Update remaining capitals
+      const newRemainingCapitals = remainingCapitals.filter(cap => cap.city !== currentCapital.city);
+      setRemainingCapitals(newRemainingCapitals);
+      
+      // Clear input and select new capital after a short delay
+      setTimeout(() => {
+        setUserInput('');
+        selectNewCapital();
+      }, 1000);
+    } else {
+      console.log('Incorrect guess!');
+      setError(`Incorrect! The capital of ${currentCapital.country} is ${currentCapital.city}`);
+      setSuccess(false);
+      
+      // Clear input and select new capital after showing the error
+      setTimeout(() => {
+        setUserInput('');
+        selectNewCapital();
+      }, 2000);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -58,105 +99,166 @@ const App = () => {
   };
 
   return (
-    <div className="game-container">
-      <h1>Capital Cities Guessing Game</h1>
+    <div style={{ 
+      padding: '20px', 
+      maxWidth: '800px', 
+      margin: '0 auto',
+      fontFamily: 'Arial, sans-serif',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      <h1 style={{ textAlign: 'center', color: '#333', margin: '20px 0' }}>Capital Cities Guessing Game</h1>
+      
       {currentCapital && (
-        <div>
-          <h2>What is the capital of {currentCapital.country}?</h2>
-          <p>Remaining capitals: {remainingCapitals.length}</p>
-          <p>Correctly guessed: {capitals.length - remainingCapitals.length}</p>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div style={{ textAlign: 'center', margin: '20px 0' }}>
+          <h2 style={{ color: '#444', marginBottom: '10px' }}>What is the capital of {currentCapital.country}?</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+            <p style={{ margin: '0' }}>Remaining capitals: {remainingCapitals.length}</p>
+            <p style={{ margin: '0' }}>Correctly guessed: {capitals.length - remainingCapitals.length}</p>
+          </div>
         </div>
       )}
-      
-      <div className="map-container">
-        <ComposableMap projection="geoMercator" style={{ width: "100%", height: "auto" }}>
-          <ZoomableGroup center={[0, 20]} zoom={1}>
-            <Geographies geography={geoUrl}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill="#EAEAEC"
-                    stroke="#D6D6DA"
-                    style={{
-                      default: { outline: 'none' },
-                      hover: { outline: 'none', fill: '#F5F4F6' },
-                      pressed: { outline: 'none' }
-                    }}
-                  />
-                ))
-              }
-            </Geographies>
-            
+
+      {(error || success) && (
+        <div style={{ 
+          color: success ? '#2e7d32' : '#d32f2f',
+          backgroundColor: success ? '#e8f5e9' : '#ffebee',
+          padding: '10px',
+          borderRadius: '4px',
+          margin: '10px auto',
+          maxWidth: '600px',
+          textAlign: 'center',
+          fontWeight: 'bold'
+        }}>
+          {error || 'Correct!'}
+        </div>
+      )}
+
+      <div style={{ 
+        backgroundColor: '#F5F5F5', 
+        borderRadius: '10px', 
+        padding: '20px',
+        margin: '20px 0',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        flex: '1'
+      }}>
+        <ComposableMap
+          projection="geoMercator"
+          projectionConfig={{
+            scale: 100
+          }}
+          style={{
+            width: "100%",
+            height: "400px"
+          }}
+        >
+          <g>
+            <rect
+              x={0}
+              y={0}
+              width="800"
+              height="400"
+              fill="#E6E6E6"
+              stroke="#FFF"
+            />
             {capitals.map((capital) => (
               <Marker key={capital.city} coordinates={capital.coordinates}>
                 <circle
-                  r={4}
+                  r={5}
                   fill={
                     guessedCapitals.includes(capital)
                       ? "#00FF00"  // Green for correctly guessed
                       : "#444444"  // Dark grey for unguessed
                   }
                   stroke="#FFF"
-                  strokeWidth={1}
+                  strokeWidth={2}
                 />
               </Marker>
             ))}
-          </ZoomableGroup>
+          </g>
         </ComposableMap>
       </div>
 
-      <div className="input-container">
-        <input
-          type="text"
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Enter capital city name"
-          style={{
-            padding: '8px 16px',
-            fontSize: '16px',
-            marginRight: '10px',
-            borderRadius: '4px',
-            border: '1px solid #ccc'
-          }}
-        />
-        <button 
-          onClick={handleGuess}
-          style={{
-            padding: '8px 16px',
-            fontSize: '16px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          Submit Guess
-        </button>
+      <div style={{ 
+        padding: '20px',
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        margin: '20px 0'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: '10px',
+          maxWidth: '600px',
+          margin: '0 auto'
+        }}>
+          <input
+            ref={inputRef}
+            type="text"
+            value={userInput}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            placeholder="Enter capital city name"
+            style={{
+              padding: '15px 20px',
+              fontSize: '18px',
+              borderRadius: '4px',
+              border: '2px solid #ccc',
+              width: '60%',
+              outline: 'none',
+              transition: 'all 0.3s',
+              borderColor: error ? '#d32f2f' : success ? '#2e7d32' : '#ccc'
+            }}
+          />
+          <button 
+            onClick={handleGuess}
+            style={{
+              padding: '15px 30px',
+              fontSize: '18px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              transition: 'background-color 0.3s',
+              width: '30%',
+              fontWeight: 'bold'
+            }}
+          >
+            Submit Guess
+          </button>
+        </div>
       </div>
 
       {remainingCapitals.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-          <h2>Congratulations! You've guessed all the capitals!</h2>
+        <div style={{ 
+          textAlign: 'center', 
+          margin: '20px 0',
+          padding: '20px',
+          backgroundColor: '#e8f5e9',
+          borderRadius: '8px'
+        }}>
+          <h2 style={{ color: '#2e7d32' }}>Congratulations! You've guessed all the capitals!</h2>
           <button
             onClick={() => {
+              console.log('Restarting game');
               setRemainingCapitals([...capitals]);
               setGuessedCapitals([]);
+              setUserInput('');
               selectNewCapital();
             }}
             style={{
-              padding: '12px 24px',
-              fontSize: '16px',
+              padding: '15px 30px',
+              fontSize: '18px',
               backgroundColor: '#28a745',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
-              marginTop: '10px'
+              marginTop: '10px',
+              fontWeight: 'bold'
             }}
           >
             Play Again
