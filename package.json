@@ -8,15 +8,15 @@
     "build": "parcel build src/index.html"
   },
   "dependencies": {
+    "d3-geo": "^2.0.2",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "react-simple-maps": "^2.3.0",
-    "d3-geo": "^2.0.2"
+    "react-simple-maps": "^1.0.0"
   },
   "devDependencies": {
-    "parcel-bundler": "^1.12.5",
     "@babel/core": "^7.12.0",
+    "@babel/preset-env": "^7.12.0",
     "@babel/preset-react": "^7.12.0",
-    "@babel/preset-env": "^7.12.0"
+    "parcel-bundler": "^1.12.5"
   }
 }

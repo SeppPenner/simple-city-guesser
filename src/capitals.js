@@ -22,7 +22,7 @@ export const capitals = [
     { city: "Washington, D.C.", country: "United States", coordinates: [-77.0369, 38.9072] },
     { city: "Ottawa", country: "Canada", coordinates: [-75.6972, 45.4215] },
     { city: "Mexico City", country: "Mexico", coordinates: [-99.1332, 19.4326] },
-    { city: "Brasília", country: "Brazil", coordinates: [-47.8645, -15.7942] },
+    { city: "Brasilia", country: "Brazil", coordinates: [-47.8645, -15.7942] },
     { city: "Buenos Aires", country: "Argentina", coordinates: [-58.3816, -34.6037] },
     { city: "Lima", country: "Peru", coordinates: [-77.0428, -12.0464] },
     { city: "Santiago", country: "Chile", coordinates: [-70.6483, -33.4489] },
