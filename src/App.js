@@ -7,6 +7,9 @@ import {
 } from "react-simple-maps";
 import { capitals } from './capitals';
 
+// URL zu einer vollständigen Weltkarten-TopoJSON
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
 const App = () => {
   const [remainingCapitals, setRemainingCapitals] = useState([...capitals]);
   const [currentCapital, setCurrentCapital] = useState(null);
@@ -25,7 +28,6 @@ const App = () => {
       setCurrentCapital(selected);
       setError(null);
       setSuccess(false);
-      // Don't clear input here anymore
     }
   }, [remainingCapitals]);
 
@@ -101,10 +103,9 @@ const App = () => {
   return (
     <div style={{ 
       padding: '20px', 
-      maxWidth: '800px', 
+      maxWidth: '1000px', 
       margin: '0 auto',
       fontFamily: 'Arial, sans-serif',
-      minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column'
     }}>
@@ -146,37 +147,55 @@ const App = () => {
         <ComposableMap
           projection="geoMercator"
           projectionConfig={{
-            scale: 100
+            scale: 100,
+            center: [0, 20]
           }}
           style={{
             width: "100%",
             height: "400px"
           }}
         >
-          <g>
-            <rect
-              x={0}
-              y={0}
-              width="800"
-              height="400"
-              fill="#E6E6E6"
-              stroke="#FFF"
-            />
-            {capitals.map((capital) => (
-              <Marker key={capital.city} coordinates={capital.coordinates}>
-                <circle
-                  r={5}
-                  fill={
-                    guessedCapitals.includes(capital)
-                      ? "#00FF00"  // Green for correctly guessed
-                      : "#444444"  // Dark grey for unguessed
-                  }
-                  stroke="#FFF"
-                  strokeWidth={2}
+          <Geographies geography={geoUrl}>
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="#EAEAEC"
+                  stroke="#D6D6DA"
+                  style={{
+                    default: {
+                      fill: "#EAEAEC",
+                      outline: "none"
+                    },
+                    hover: {
+                      fill: "#F5F5F5",
+                      outline: "none"
+                    },
+                    pressed: {
+                      fill: "#E4E4E4",
+                      outline: "none"
+                    }
+                  }}
                 />
-              </Marker>
-            ))}
-          </g>
+              ))
+            }
+          </Geographies>
+          
+          {capitals.map((capital) => (
+            <Marker key={capital.city} coordinates={capital.coordinates}>
+              <circle
+                r={4}
+                fill={
+                  guessedCapitals.includes(capital)
+                    ? "#00FF00"  // Grün für geratene Hauptstädte
+                    : "#444444"  // Dunkelgrau für noch nicht geratene
+                }
+                stroke="#FFF"
+                strokeWidth={2}
+              />
+            </Marker>
+          ))}
         </ComposableMap>
       </div>
 
