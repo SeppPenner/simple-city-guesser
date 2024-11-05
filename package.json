@@ -1,0 +1,22 @@
+{
+  "name": "simple-city-guesser",
+  "version": "1.0.0",
+  "description": "A world map capital city guessing game",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html"
+  },
+  "dependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-simple-maps": "^2.3.0",
+    "d3-geo": "^2.0.2"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5",
+    "@babel/core": "^7.12.0",
+    "@babel/preset-react": "^7.12.0",
+    "@babel/preset-env": "^7.12.0"
+  }
+}
