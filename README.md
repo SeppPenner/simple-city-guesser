@@ -38,10 +38,20 @@ npm install
 
 To start the development server:
 ```bash
-npm start
+npm run dev
 ```
 
-The application will be available at `http://localhost:1234`.
+The application will be available at `http://localhost:5173`.
+
+To build for production:
+```bash
+npm run build
+```
+
+To preview the production build:
+```bash
+npm run preview
+```
 
 ## How to Play
 
@@ -54,9 +64,9 @@ The application will be available at `http://localhost:1234`.
 
 ## Technologies Used
 
-- React.js
+- React 18
 - react-simple-maps
-- Parcel Bundler
+- Vite
 - D3-geo
 
 ## Project Structure
@@ -64,12 +74,12 @@ The application will be available at `http://localhost:1234`.
 ```
 simple-city-guesser/
 ├── src/
-│   ├── App.js         # Main application component
-│   ├── index.js       # Application entry point
+│   ├── App.jsx        # Main application component
+│   ├── index.jsx      # Application entry point
 │   ├── index.html     # HTML template
 │   └── capitals.js    # Capital cities data
+├── vite.config.js     # Vite configuration
 ├── package.json
-├── .babelrc
 └── .gitignore
 ```
 

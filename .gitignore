@@ -31,5 +31,5 @@ yarn-error.log*
 *.swn
 *.bak
 
-# Parcel
-.parcel-cache
+# Vite
+*.local
