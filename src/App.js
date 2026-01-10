@@ -24,7 +24,6 @@ const App = () => {
     if (remainingCapitals.length > 0) {
       const randomIndex = Math.floor(Math.random() * remainingCapitals.length);
       const selected = remainingCapitals[randomIndex];
-      console.log('Selected new capital:', selected.city);
       setCurrentCapital(selected);
       setError(null);
       setSuccess(false);
@@ -57,14 +56,10 @@ const App = () => {
       return;
     }
 
-    console.log('Submitting guess:', userInput);
-    console.log('Current capital:', currentCapital.city);
-    
     const normalizedInput = userInput.toLowerCase().trim();
     const normalizedAnswer = currentCapital.city.toLowerCase().trim();
 
     if (normalizedInput === normalizedAnswer) {
-      console.log('Correct guess!');
       setSuccess(true);
       setError(null);
       
@@ -82,7 +77,6 @@ const App = () => {
         selectNewCapital();
       }, 1000);
     } else {
-      console.log('Incorrect guess!');
       setError(`Incorrect! The capital of ${currentCapital.country} is ${currentCapital.city}`);
       setSuccess(false);
       
@@ -187,7 +181,7 @@ const App = () => {
               <circle
                 r={4}
                 fill={
-                  guessedCapitals.includes(capital)
+                  guessedCapitals.some(guessed => guessed.city === capital.city)
                     ? "#00FF00"  // Grün für geratene Hauptstädte
                     : "#444444"  // Dunkelgrau für noch nicht geratene
                 }
@@ -218,7 +212,7 @@ const App = () => {
             type="text"
             value={userInput}
             onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder="Enter capital city name"
             style={{
               padding: '15px 20px',
@@ -262,11 +256,14 @@ const App = () => {
           <h2 style={{ color: '#2e7d32' }}>Congratulations! You've guessed all the capitals!</h2>
           <button
             onClick={() => {
-              console.log('Restarting game');
-              setRemainingCapitals([...capitals]);
+              const newRemaining = [...capitals];
+              const randomIndex = Math.floor(Math.random() * newRemaining.length);
+              setRemainingCapitals(newRemaining);
               setGuessedCapitals([]);
               setUserInput('');
-              selectNewCapital();
+              setCurrentCapital(newRemaining[randomIndex]);
+              setError(null);
+              setSuccess(false);
             }}
             style={{
               padding: '15px 30px',
