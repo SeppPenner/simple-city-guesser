@@ -14,7 +14,7 @@ A fun and interactive web application built with React that helps users learn wo
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
-- Node.js (version 18.0.0 or higher)
+- Node.js 20.19.0 or newer within 20.x, or 22.12.0 or newer (required by Vite 8)
 - npm (comes with Node.js)
 
 ## Installation
@@ -64,9 +64,9 @@ npm run preview
 
 ## Technologies Used
 
-- React 18
+- React 19
 - react-simple-maps
-- Vite
+- Vite 8
 - D3-geo
 
 ## Project Structure
