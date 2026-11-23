@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ComposableMap,
   Geographies,
@@ -10,32 +10,27 @@ import { capitals } from './capitals';
 // URL zu einer vollständigen Weltkarten-TopoJSON
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
+const pickRandomCapital = (list) =>
+  list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null;
+
 const App = () => {
   const [remainingCapitals, setRemainingCapitals] = useState([...capitals]);
-  const [currentCapital, setCurrentCapital] = useState(null);
+  const [currentCapital, setCurrentCapital] = useState(() => pickRandomCapital(capitals));
   const [userInput, setUserInput] = useState('');
   const [guessedCapitals, setGuessedCapitals] = useState([]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const inputRef = useRef(null);
 
-  // Initialize the game
-  const selectNewCapital = useCallback(() => {
-    if (remainingCapitals.length > 0) {
-      const randomIndex = Math.floor(Math.random() * remainingCapitals.length);
-      const selected = remainingCapitals[randomIndex];
-      setCurrentCapital(selected);
-      setError(null);
-      setSuccess(false);
-    }
-  }, [remainingCapitals]);
-
-  // Start the game when component mounts
-  useEffect(() => {
-    if (!currentCapital) {
-      selectNewCapital();
-    }
-  }, [currentCapital, selectNewCapital]);
+  // Ask for the next capital from the given list, or for none once the list is empty.
+  // The callers pass the list explicitly: a timeout closure still holds the
+  // remainingCapitals of the render that scheduled it, which may be outdated.
+  const showNextCapital = (list) => {
+    setUserInput('');
+    setCurrentCapital(pickRandomCapital(list));
+    setError(null);
+    setSuccess(false);
+  };
 
   // Focus input field when capital changes
   useEffect(() => {
@@ -72,19 +67,13 @@ const App = () => {
       setRemainingCapitals(newRemainingCapitals);
       
       // Clear input and select new capital after a short delay
-      setTimeout(() => {
-        setUserInput('');
-        selectNewCapital();
-      }, 1000);
+      setTimeout(() => showNextCapital(newRemainingCapitals), 1000);
     } else {
       setError(`Incorrect! The capital of ${currentCapital.country} is ${currentCapital.city}`);
       setSuccess(false);
-      
+
       // Clear input and select new capital after showing the error
-      setTimeout(() => {
-        setUserInput('');
-        selectNewCapital();
-      }, 2000);
+      setTimeout(() => showNextCapital(remainingCapitals), 2000);
     }
   };
 
@@ -256,14 +245,9 @@ const App = () => {
           <h2 style={{ color: '#2e7d32' }}>Congratulations! You've guessed all the capitals!</h2>
           <button
             onClick={() => {
-              const newRemaining = [...capitals];
-              const randomIndex = Math.floor(Math.random() * newRemaining.length);
-              setRemainingCapitals(newRemaining);
+              setRemainingCapitals([...capitals]);
               setGuessedCapitals([]);
-              setUserInput('');
-              setCurrentCapital(newRemaining[randomIndex]);
-              setError(null);
-              setSuccess(false);
+              showNextCapital(capitals);
             }}
             style={{
               padding: '15px 30px',
